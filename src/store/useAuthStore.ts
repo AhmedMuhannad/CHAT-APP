@@ -7,6 +7,8 @@ type User = any; // replace with actual user type
 type Store = {
   authUser: User | null;
   isCheckingAuth: boolean;
+  onlineUsers: any[];
+
   checkAuth: () => Promise<void>;
   isSigningUp: boolean;
   isLogin: boolean;
@@ -21,6 +23,8 @@ export const useAuthStore = create<Store>((set) => ({
   isCheckingAuth: true,
   isSigningUp: false,
   isLogin: false,
+  onlineUsers: [],
+
   checkAuth: async () => {
     try {
       const res = await baseUrl.get("/auth/check-auth");
