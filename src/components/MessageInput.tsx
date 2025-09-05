@@ -13,13 +13,14 @@ const MessageInput = () => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
     try {
+      console.log("did it work?");
+
       await sendMessage({
         text: text.trim(),
         image: imagePreview,
       });
       setText("");
       setImagePreview(null);
-      console.log("hmm");
     } catch (error) {
       console.error("Failed to send message:", error);
     }
@@ -70,7 +71,7 @@ const MessageInput = () => {
             type="button"
             className={`hidden sm:flex btn btn-circle
                      ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
-            onClick={() => fileInputRef.current?.click()}
+            // onClick={() => fileInputRef.current?.click()}
           >
             <Image size={20} />
           </button>

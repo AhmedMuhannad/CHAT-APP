@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { baseUrl } from "../api/baseUrl";
+import { useAuthStore } from "./useAuthStore";
 type Store = {
   messages: any[];
   users: any[];
@@ -12,6 +13,8 @@ type Store = {
   isSelectedUser: boolean;
   setSelectedUser: (selectedUser: any) => void;
   sendMessage: (message: any) => Promise<any>;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
 };
 export const useChatStore = create<Store>((set, get) => ({
   messages: [],
@@ -34,7 +37,7 @@ export const useChatStore = create<Store>((set, get) => ({
     try {
       set({ isMessageLoading: true });
       const res = await baseUrl.get(`/messages/${userId}`);
-      set({ messages: [res.data] });
+      set({ messages: res.data });
     } catch (err) {
     } finally {
       set({ isMessageLoading: false });
@@ -50,9 +53,26 @@ export const useChatStore = create<Store>((set, get) => ({
         `/messages/send/${selectedUser._id}`,
         messageData
       );
-      console.log("messsage is", res);
-      console.log("your message is: ", res);
-      set({ messages: [...messages, res.data] });
+      set({ messages: [...messages, res.data.newMessage] });
     } catch (err) {}
+  },
+  subscribeToMessages: () => {
+    const { selectedUser } = get();
+    console.log("selected is?: ", selectedUser);
+
+    if (!selectedUser) return;
+    console.log("then work");
+    const socket = useAuthStore.getState().socket;
+    socket.on("newMessage", (newMessage: any) => {
+      console.log("new message: ", newMessage);
+
+      set({
+        messages: [...get().messages, newMessage],
+      });
+    });
+  },
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("newMessage");
   },
 }));
