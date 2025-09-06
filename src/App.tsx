@@ -9,27 +9,21 @@ import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/useAuthStore";
 import { Toaster } from "react-hot-toast";
 import { Loader } from "lucide-react";
+import FriendRequestsPage from "./pages/FriendRequestsPage";
 const App = () => {
-  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
-  console.log("online users", { onlineUsers });
+  const { authUser, checkAuth } = useAuthStore();
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
   console.log({ authUser });
-  // if (isCheckingAuth && !authUser) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen">
-  //       <Loader className="size-10 animate-spin" />
-  //     </div>
-  //   );
-  // }
+
   return (
     <div>
       <Navbar />
       <Routes>
         <Route
           path="/"
-          element={authUser ? <Home /> : <Navigate to="/login" />}
+          element={authUser ? <Home /> : <Navigate to="/signup" />}
         />
         <Route
           path="/signup"
@@ -39,7 +33,7 @@ const App = () => {
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to="/" />}
         />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/friend-requests" element={<FriendRequestsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       <Toaster />

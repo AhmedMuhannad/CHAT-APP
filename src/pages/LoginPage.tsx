@@ -95,14 +95,6 @@ const LoginPage = () => {
               )}
             </button>
           </form>{" "}
-          <div className="text-center">
-            <p className="text-base-content/60">
-              Already have an account?{" "}
-              <Link to="/login" className="link link-primary">
-                Sign in
-              </Link>
-            </p>
-          </div>
         </div>
       </div>{" "}
     </div>

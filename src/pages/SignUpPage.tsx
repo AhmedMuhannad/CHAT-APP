@@ -6,11 +6,18 @@ import toast from "react-hot-toast";
 import AuthImagePattern from "../components/AuthImagePatter";
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    fullName: string;
+    email: string;
+    password: string;
+    userName: string;
+    profileImage: File | null;
+  }>({
     fullName: "",
     email: "",
     password: "",
     userName: "",
+    profileImage: null,
   });
   const { signUp, isSigningUp } = useAuthStore();
   const validateForm = () => {
@@ -27,8 +34,19 @@ const SignUpPage = () => {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     const sucess = validateForm();
+    console.log(sucess);
     if (sucess) {
-      signUp(formData);
+      const data = new FormData();
+      data.append("fullName", formData.fullName);
+      data.append("email", formData.email);
+      data.append("password", formData.password);
+      data.append("userName", formData.userName);
+      console.log("data is: ", data);
+      if (formData.profileImage) {
+        data.append("profileImage", formData.profileImage);
+      }
+
+      signUp(data);
     }
   };
   return (
@@ -52,6 +70,24 @@ const SignUpPage = () => {
           </div>
           <form action="" onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
+              {" "}
+              <label className="label">
+                <span className="label-text font-medium">Profile Image</span>
+              </label>
+              <input
+                type="file"
+                name="profileImage"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setFormData({
+                      ...formData,
+                      profileImage: e.target.files[0],
+                    });
+                  }
+                }}
+                className="file-input file-input-bordered w-full"
+              />
               <label className="label">
                 <span className="label-text font-medium">Full name</span>
               </label>
