@@ -55,7 +55,7 @@ const MessageInput = () => {
         <div className="flex-1 flex gap-2">
           <input
             type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            className="w-full input input-bordered rounded-lg input-sm sm:input-md focus:outline-hidden"
             placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -78,10 +78,10 @@ const MessageInput = () => {
         </div>{" "}
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-sm size-9.5 btn-circle"
           disabled={!text.trim() && !imagePreview}
         >
-          <Send size={22} />
+          <Send size={20} />
         </button>
       </form>
     </div>

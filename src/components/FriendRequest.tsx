@@ -3,11 +3,11 @@ import { useChatStore } from "../store/useChatStore";
 
 const FriendRequest = () => {
   const { friendsRequests, getFriendRequests, acceptFriend } = useChatStore();
-  console.log("what is :", friendsRequests);
+  console.log("your request is:", friendsRequests);
   return (
     <div>
       <div className="flex  gap-4">
-        <div className="size-24 bg-amber-200" />
+        {/* <div className="size-24 bg-amber-200" /> */}
         <div className="flex flex-col justify-around">
           {friendsRequests.length > 0 &&
             friendsRequests.map((request) => (
@@ -27,13 +27,13 @@ const FriendRequest = () => {
                   </button>
                   <button className="border bg-amber-300 px-2 rounded-sm">
                     Reject
-                  </button>
+                  </button>{" "}
+                  <hr className="border-t border-gray-200 my-4 " />
                 </div>
               </>
             ))}
         </div>
       </div>
-      <hr className="border-t border-gray-200 my-4 " />
     </div>
   );
 };
