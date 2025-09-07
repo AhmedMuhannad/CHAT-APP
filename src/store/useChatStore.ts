@@ -25,6 +25,7 @@ type Store = {
   acceptFriend: (id: string) => void;
   getFriends: () => void;
   subscribeToFriends: () => void;
+  unsubscribeFromFriends: () => void;
 };
 export const useChatStore = create<Store>((set, get) => ({
   messages: [],
@@ -77,10 +78,11 @@ export const useChatStore = create<Store>((set, get) => ({
   },
   subscribeToMessages: () => {
     const { selectedUser } = get();
-    console.log("selected is?: ", selectedUser);
+    // console.log("selected is?: ", selectedUser);
 
     if (!selectedUser) return;
     console.log("then work");
+
     const socket = useAuthStore.getState().socket;
     socket.on("newMessage", (newMessage: any) => {
       console.log("new message: ", newMessage);
@@ -124,14 +126,34 @@ export const useChatStore = create<Store>((set, get) => ({
       throw err;
     }
   },
+  // acceptFriend: async (id: string) => {
+  //   try {
+  //     const res = await baseUrl.post(`auth/accept-request/${id}`);
+  //     console.log(res);
+  //   } catch (errrr) {
+  //     throw errrr;
+  //   }
+  // },
+  // in useChatStore.js
+
   acceptFriend: async (id: string) => {
+    const { friendsRequests } = get(); // Get the current requests
     try {
-      const res = await baseUrl.post(`auth/accept-request/${id}`);
-      console.log(res);
-    } catch (errrr) {
-      throw errrr;
+      await baseUrl.post(`auth/accept-request/${id}`);
+
+      // Update the state immediately after the request is successful
+      set({
+        friendsRequests: friendsRequests.filter(
+          (request) => request.from._id !== id
+        ),
+      });
+      toast.success("Friend request accepted!");
+    } catch (err) {
+      toast.error("Failed to accept friend request.");
+      throw err;
     }
   },
+
   getFriends: async () => {
     try {
       const res = await baseUrl.get("auth/show-friends");
@@ -143,16 +165,27 @@ export const useChatStore = create<Store>((set, get) => ({
   },
   subscribeToFriends: () => {
     const socket = useAuthStore.getState().socket;
+    if (!socket) return;
 
-    // Remove any existing listener first
-    console.log("HI i am IO SOCKET");
-    socket.on("friendAdded", (newFriend: any) => {
+    // We define the handler here, so it's the same function instance.
+    const friendAddedHandler = (newFriend: any) => {
       console.log("new friend received:", newFriend);
-
-      // Safely update state
       set((state) => ({
         friends: [...state.friends, newFriend],
       }));
-    });
+    };
+
+    // The `off` and `on` should be in the `useEffect` itself for proper cleanup.
+    // The handler is passed as a named function, not an arrow function.
+    socket.on("friendAdded", friendAddedHandler);
+
+    // This is not part of the `subscribe` method itself, but rather the `useEffect` cleanup.
+    // We'll fix the `useEffect` next to handle this properly.
+  },
+  unsubscribeFromFriends: () => {
+    const socket = useAuthStore.getState().socket;
+    if (!socket) return;
+
+    socket.off("friendAdded");
   },
 }));

@@ -1,15 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore"; // Import useAuthStore
 
 const FriendRequest = () => {
-  const { friendsRequests, getFriendRequests, acceptFriend } = useChatStore();
+  const {
+    friendsRequests,
+    getFriendRequests,
+    acceptFriend,
+    subscribeToFriends,
+    unsubscribeFromFriends,
+  } = useChatStore();
   console.log("your request is:", friendsRequests);
+  const socket = useAuthStore((state) => state.socket);
+  const friendAddedHandler = (newFriend: any) => {
+    useChatStore.setState((state) => ({
+      friends: [...state.friends, newFriend],
+    }));
+  };
+
+  useEffect(() => {
+    getFriendRequests();
+
+    if (socket) {
+      // Attach the listener
+      socket.on("friendAdded", friendAddedHandler);
+    }
+
+    // Return the cleanup function
+    return () => {
+      if (socket) {
+        socket.off("friendAdded", friendAddedHandler);
+      }
+    };
+  }, [socket, getFriendRequests]); // Depend on socket and getFriendRequests
+
   return (
     <div>
       <div className="flex  gap-4">
         {/* <div className="size-24 bg-amber-200" /> */}
         <div className="flex flex-col justify-around">
-          {friendsRequests.length > 0 &&
+          {friendsRequests.length >= 0 &&
             friendsRequests.map((request) => (
               <>
                 {" "}
@@ -18,8 +48,7 @@ const FriendRequest = () => {
                 <div className="flex gap-4">
                   <button
                     onClick={() => {
-                      acceptFriend(request.from._id);
-                      getFriendRequests();
+                      acceptFriend(request.from._id); // This now handles the state update
                     }}
                     className="border bg-amber-300 px-2 rounded-sm"
                   >

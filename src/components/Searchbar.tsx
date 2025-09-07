@@ -38,7 +38,7 @@ const Searchbar = () => {
         className="w-full border border-gray-400 p-2 rounded-md focus:outline-none"
       />
 
-      {userNames.length > 0 && isFocused && input.trim() !== "" && (
+      {userNames.length > 0 && input.trim() !== "" && (
         <div className="absolute top-full left-0 w-full max-h-[200px] overflow-y-auto bg-white border border-gray-300 rounded-md shadow-md z-10">
           {userNames.map((user) => (
             <div
